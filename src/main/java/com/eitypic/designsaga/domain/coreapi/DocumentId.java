@@ -1,7 +1,9 @@
 package com.eitypic.designsaga.domain.coreapi;
 
+import com.eitypic.designsaga.infrastructure.DocumentIdSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.util.Assert;
 
 import java.util.UUID;
@@ -9,10 +11,10 @@ import java.util.UUID;
 import static lombok.AccessLevel.PRIVATE;
 
 @RequiredArgsConstructor(access = PRIVATE)
-@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
+@JsonSerialize(using = DocumentIdSerializer.class)
 public class DocumentId {
 
-    @ToString.Include
     private final UUID uuid;
 
     public static DocumentId generate() {
@@ -24,4 +26,8 @@ public class DocumentId {
         return new DocumentId(UUID.fromString(uuid));
     }
 
+    @Override
+    public String toString() {
+        return uuid.toString();
+    }
 }
