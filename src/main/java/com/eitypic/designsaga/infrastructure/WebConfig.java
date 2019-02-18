@@ -28,8 +28,8 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS
 // Respect the methods names be cause in most of the cases those are the beans names (instead to use @Bean(name="beanName"))
 public class WebConfig implements WebMvcConfigurer {
 
-	@Autowired
-	private HandlerInstantiator handlerInstantiator;
+    @Autowired
+    private HandlerInstantiator handlerInstantiator;
 
     @Autowired
     private ObjectMapper objectMapper;

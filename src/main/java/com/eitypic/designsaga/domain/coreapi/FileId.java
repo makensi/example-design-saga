@@ -1,7 +1,9 @@
 package com.eitypic.designsaga.domain.coreapi;
 
+import com.eitypic.designsaga.infrastructure.FileIdSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.util.Assert;
 
 import java.util.UUID;
@@ -9,7 +11,8 @@ import java.util.UUID;
 import static lombok.AccessLevel.PRIVATE;
 
 @RequiredArgsConstructor(access = PRIVATE)
-@ToString
+@EqualsAndHashCode
+@JsonSerialize(using = FileIdSerializer.class)
 public class FileId {
 
     private final UUID uuid;
@@ -23,4 +26,8 @@ public class FileId {
         return new FileId(UUID.fromString(uuid));
     }
 
+    @Override
+    public String toString() {
+        return uuid.toString();
+    }
 }

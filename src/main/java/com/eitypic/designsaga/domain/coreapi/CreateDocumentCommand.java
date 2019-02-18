@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Value
 public class CreateDocumentCommand {
@@ -11,4 +12,6 @@ public class CreateDocumentCommand {
     DocumentId id;
     @NotBlank
     String name;
+    @NotNull
+    Integer numberOfFiles;
 }

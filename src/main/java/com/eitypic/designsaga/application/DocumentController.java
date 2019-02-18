@@ -3,6 +3,7 @@ package com.eitypic.designsaga.application;
 import com.eitypic.designsaga.application.request.CreateDocumentRequest;
 import com.eitypic.designsaga.domain.coreapi.CreateDocumentCommand;
 import com.eitypic.designsaga.domain.coreapi.DocumentId;
+import com.eitypic.designsaga.domain.coreapi.DocumentView;
 import com.eitypic.designsaga.domain.coreapi.ListDocumentsQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +38,17 @@ public class DocumentController {
         DocumentId documentId = DocumentId.generate();
         commandGateway.sendAndWait(new CreateDocumentCommand(
                 documentId,
-                request.getName()));
+                request.getName(),
+                request.getNumberOfFiles()));
 
         return documentId.toString();
     }
 
     @GetMapping
-    public List<DocumentId> list() {
-        List<DocumentId> documentIds = queryGateway.query(
+    public List<DocumentView> list() {
+        return queryGateway.query(
                 new ListDocumentsQuery(1000, 1),
-                multipleInstancesOf(DocumentId.class)
+                multipleInstancesOf(DocumentView.class)
         ).join();
-        return documentIds;
     }
 }

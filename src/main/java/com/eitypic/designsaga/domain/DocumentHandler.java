@@ -20,7 +20,7 @@ public class DocumentHandler {
 
     @CommandHandler
     public void handle(CreateDocumentCommand command) throws Exception {
-        logger.debug(this.getClass().getSimpleName() + " - " + command.getClass().getSimpleName());
+        logger.debug(this.getClass().getSimpleName() + " > " + command.getClass().getSimpleName());
         if (documentExists(command)) {
             throw new NameExistsException();
         }

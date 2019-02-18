@@ -5,4 +5,5 @@ import lombok.Value;
 @Value
 public class CreateDocumentRequest {
     String name;
+    Integer numberOfFiles;
 }

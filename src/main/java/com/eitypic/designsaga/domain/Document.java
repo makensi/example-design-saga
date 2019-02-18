@@ -1,18 +1,17 @@
 package com.eitypic.designsaga.domain;
 
-import com.eitypic.designsaga.domain.coreapi.CreateDocumentCommand;
-import com.eitypic.designsaga.domain.coreapi.DocumentCreatedEvent;
-import com.eitypic.designsaga.domain.coreapi.DocumentId;
-import com.eitypic.designsaga.domain.coreapi.FileId;
+import com.eitypic.designsaga.domain.coreapi.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
-import org.axonframework.commandhandling.model.AggregateLifecycle;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
 
 import java.util.List;
+
+import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 
 @Slf4j
 @Aggregate
@@ -22,24 +21,55 @@ public class Document {
 
     @EqualsAndHashCode.Include
     @AggregateIdentifier
-    private DocumentId documentId;
+    private DocumentId id;
 
     private String name;
 
     private List<FileId> fileIds;
 
+    private boolean deleted = false;
+
     public Document(CreateDocumentCommand command) {
-        logger.debug(this.getClass().getSimpleName() + " - " + command.getClass().getSimpleName());
-        AggregateLifecycle.apply(new DocumentCreatedEvent(
+        logger.debug(this.getClass().getSimpleName() + " > " + command.getClass().getSimpleName());
+        apply(new CreateDocumentRequestedEvent(
                 command.getId(),
-                command.getName()
+                command.getName(),
+                command.getNumberOfFiles()
         ));
+    }
+
+    @CommandHandler
+    public void handle(FinishDocumentCreationCommand command) {
+        logger.debug(this.getClass().getSimpleName() + " > " + command.getClass().getSimpleName());
+        apply(new DocumentCreatedEvent(
+                id,
+                fileIds
+        ));
+    }
+
+    @CommandHandler
+    public void handle(DeleteDocumentCommand command) {
+        logger.debug(this.getClass().getSimpleName() + " > " + command.getClass().getSimpleName());
+        apply(new DocumentDeletedEvent(id));
+    }
+
+    @EventSourcingHandler
+    public void on(CreateDocumentRequestedEvent event) {
+        logger.debug(this.getClass().getSimpleName() + " > " + event.getClass().getSimpleName());
+        id = event.getDocumentId();
+        name = event.getName();
     }
 
     @EventSourcingHandler
     public void on(DocumentCreatedEvent event) {
-        logger.debug(this.getClass().getSimpleName() + " - " + event.getClass().getSimpleName());
-        this.documentId = event.getDocumentId();
-        this.name = event.getName();
+        logger.debug(this.getClass().getSimpleName() + " > " + event.getClass().getSimpleName());
+        fileIds = event.getFileIds();
     }
+
+    @EventSourcingHandler
+    public void on(DocumentDeletedEvent event) {
+        logger.debug(this.getClass().getSimpleName() + " > " + event.getClass().getSimpleName());
+        deleted = true;
+    }
+
 }

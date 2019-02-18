@@ -1,40 +1,54 @@
 package com.eitypic.designsaga.infrastructure;
 
-import com.eitypic.designsaga.domain.coreapi.DocumentCreatedEvent;
-import com.eitypic.designsaga.domain.coreapi.DocumentId;
-import com.eitypic.designsaga.domain.coreapi.ListDocumentsQuery;
-import com.eitypic.designsaga.domain.coreapi.NameExistsQuery;
+import com.eitypic.designsaga.domain.coreapi.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
 @NoArgsConstructor
 public class DocumentProjection {
 
-    private Map<DocumentId, String> documents = new HashMap<>();
+    private List<DocumentView> documents = new ArrayList<>();
 
     @QueryHandler
     public boolean query(NameExistsQuery query) {
-        return documents.values().contains(query.getName().toLowerCase());
+        return documents.stream().anyMatch(documentView -> documentView.getName().equals(query.getName()));
     }
 
     @QueryHandler
-    public Set<DocumentId> query(ListDocumentsQuery query) {
-        return documents.keySet();
+    public List<DocumentView> query(ListDocumentsQuery query) {
+        return documents;
     }
 
     @EventSourcingHandler
-    public void on(DocumentCreatedEvent event) {
+    public void on(CreateDocumentRequestedEvent event) {
         logger.debug(this.getClass().getSimpleName() + " - " + event.getClass().getSimpleName());
-        documents.put(event.getDocumentId(), event.getName().toLowerCase());
+        documents.add(new DocumentView(
+                event.getDocumentId(),
+                event.getName()
+        ));
+    }
+
+    @EventSourcingHandler
+    public void on(FileCreatedEvent event) {
+        logger.debug(this.getClass().getSimpleName() + " - " + event.getClass().getSimpleName());
+        documents.stream()
+                .filter(documentView -> documentView.getDocumentId().equals(event.getDocumentId()))
+                .findFirst()
+                .ifPresent(documentView -> documentView.addFile(event.getFileId()));
+    }
+
+    @EventSourcingHandler
+    public void on(DocumentDeletedEvent event) {
+        logger.debug(this.getClass().getSimpleName() + " - " + event.getClass().getSimpleName());
+        documents.removeIf(documentView -> documentView.getDocumentId().equals(event.getDocumentId()));
     }
 
 }

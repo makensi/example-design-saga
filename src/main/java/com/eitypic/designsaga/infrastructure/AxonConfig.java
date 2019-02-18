@@ -1,10 +1,12 @@
 package com.eitypic.designsaga.infrastructure;
 
 import com.eitypic.designsaga.domain.Document;
+import com.eitypic.designsaga.domain.DocumentCreationSaga;
 import com.eitypic.designsaga.domain.File;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.commandhandling.model.Repository;
+import org.axonframework.config.SagaConfiguration;
 import org.axonframework.eventsourcing.EventSourcingRepository;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.EventStore;
@@ -46,6 +48,13 @@ public class AxonConfig {
     @Bean
     public Repository<File> fileAggregateRepository(EventStore eventStore) {
         return new EventSourcingRepository<>(File.class, eventStore);
+    }
+
+    // remember to call the method sagaName + Configuration
+    // or you must set up the @Saga configurationBean name pointing this method
+    @Bean
+    public SagaConfiguration<DocumentCreationSaga> documentCreationSagaConfiguration() {
+        return SagaConfiguration.subscribingSagaManager(DocumentCreationSaga.class);
     }
 
 }
