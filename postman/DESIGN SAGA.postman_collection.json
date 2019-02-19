@@ -18,7 +18,34 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Document 1\"\n}"
+					"raw": "{\n    \"name\": \"Document 1\",\n    \"numberOfFiles\": 2\n}"
+				},
+				"url": {
+					"raw": "{{url}}/documents",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE DOCUMENT 2",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Document 2\",\n    \"numberOfFiles\": 5\n}"
 				},
 				"url": {
 					"raw": "{{url}}/documents",
